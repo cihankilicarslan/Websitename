@@ -50,11 +50,11 @@ public class bubiletData {
         //Creating a JSONObject object
         JSONObject jsonObject = new JSONObject();
         Map<String, String> treemap = new TreeMap<>();
-
-        for (int i = 0; i < 20; i++) {
+        int i=0;
+        for (WebElement event:EventT) {
 
             Thread.sleep(200);
-            hm.put("Tittle",EventT.get(i).getText());
+            hm.put("Tittle",event.getText());
             hm.put("Location",EventL.get(i).getText());
             hm.put("Date",EventD.get(i).getText());
             hm.put("Price",EventP.get(i).getText());
