@@ -1,6 +1,7 @@
 package org.example;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.asynchttpclient.ClientStats;
 import utilities.WebDriverUtil;
 import org.json.JSONObject;
 import org.openqa.selenium.By;
@@ -25,57 +26,49 @@ public class bubiletData {
 
 
     @BeforeMethod
-    public void setUp() {
+    public void setUp() throws InterruptedException {
         //go to google home page
         driver = WebDriverUtil.getDriver("chrome");
         driver.manage().window().maximize();
-        driver.get("https://www.bubilet.com.tr/izmir");
+        driver.get("https://www.bubilet.com.tr/bolu");
         driver.manage().window().maximize();
         driver.manage().timeouts().implicitlyWait(12000, TimeUnit.MILLISECONDS);
 
     }
     @Test
     public void TC1_Bubilet() throws InterruptedException {
+     //  List<WebElement> bTags = driver.findElements(By.cssSelector("div.select-city-right.scroll ul li a label b"));
 
-
-        // Hashtable<String,String> ht= new Hashtable<String, String>();
-        Map<String, String> hm = new <String, ArrayList<String>>HashMap();
-        List<String> list = new  ArrayList<>();
-        Vector<String> v=new Vector<>();
-
+        List<String> list = new ArrayList<>();
         List<WebElement> EventT = driver.findElements(By.xpath("//h3[@class='event-title']//a"));
         List<WebElement> EventL = driver.findElements(By.xpath("//ul[@class='event-info']//li[1]"));
         List<WebElement> EventD = driver.findElements(By.xpath("//ul[@class='event-info']//li[2]"));
         List<WebElement> EventP = driver.findElements(By.xpath("//div[@class='event-price']"));
         //Creating a JSONObject object
         JSONObject jsonObject = new JSONObject();
-        Map<String, String> treemap = new TreeMap<>();
-        int i=0;
-        for (WebElement event:EventT) {
 
-            Thread.sleep(200);
-            hm.put("Tittle",event.getText());
-            hm.put("Location",EventL.get(i).getText());
-            hm.put("Date",EventD.get(i).getText());
-            hm.put("Price",EventP.get(i).getText());
+        int i = 0;
 
-            list.add("{Tittle:");
-            list.add(EventT.get(i).getText());
-            list.add( "Location:");
-            list.add(EventL.get(i).getText());
-            list.add( "Date:");
-            list.add(EventD.get(i).getText());
-            list.add( "Price:");
-            list.add(EventP.get(i).getText());
-            list.add( "}");
+        for (WebElement e : EventT) {
 
+            list.add("Tittle:" + EventT.get(i).getText());
+            list.add("Location:" + EventL.get(i).getText());
+            list.add("Date:" + EventD.get(i).getText());
+            list.add("Price:" + EventP.get(i).getText());
 
+            i++;
         }
-        //Inserting key-value pairs into the json object
-        jsonObject.put("izmir",list);
+        //mapper tech
+        ObjectMapper mapper = new ObjectMapper();
 
+        try {
 
-
+            mapper.writeValue(new File("elements.json"), list);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        // object tech
+        jsonObject.put(String.valueOf(list.size()),list);
         try {
             FileWriter file = new FileWriter("output.json");
             file.write(String.valueOf(jsonObject));
@@ -84,22 +77,6 @@ public class bubiletData {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-
-
-
-        ObjectMapper mapper = new ObjectMapper();
-
-        try {
-            // Convert the list of elements to JSON and write to a file
-            mapper.writeValue(new File("elements.json"), list);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        System.out.println("JSON file created: "+jsonObject);
-        System.out.println("Current list             : " + list);
-        System.out.println("Current list hm          : " + hm);
-        // Print the TreeMap
-        //  System.out.println(treemap.values());
 
     }
 
